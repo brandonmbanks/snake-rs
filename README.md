@@ -1,6 +1,8 @@
 # snake-rs
 Snake clone coded in Rust and WASM
 
+<img src="gameplay_1.png" alt="gameplay" width="200"/>
+
 ## How to use
 
 Download and install Rust!

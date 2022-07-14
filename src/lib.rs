@@ -2,7 +2,6 @@ mod random;
 mod snake;
 
 use js_sys::Function;
-use random::get_random_number;
 use snake::{Direction, Position, SnakeGame};
 use std::cell::RefCell;
 use wasm_bindgen::{prelude::*, JsCast};
