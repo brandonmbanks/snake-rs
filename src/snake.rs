@@ -3,14 +3,13 @@ use std::collections::VecDeque;
 use crate::random::get_random_number;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
-struct Position {
-    x: usize,
-    y: usize,
+pub struct Position {
+    pub x: usize,
+    pub y: usize,
 }
 
-
 #[derive(Debug, Clone, Copy)]
-enum Direction {
+pub enum Direction {
     Up,
     Right,
     Down,
@@ -19,17 +18,17 @@ enum Direction {
 
 #[derive(Debug)]
 pub struct SnakeGame {
-    width: usize,
-    height: usize,
-    snake: VecDeque<Position>,
+    pub width: usize,
+    pub height: usize,
+    pub snake: VecDeque<Position>,
     direction: Direction,
     next_direction: Direction,
-    food: Position,
-    finished: bool,
+    pub food: Position,
+    pub finished: bool,
 }
 
 impl SnakeGame {
-    fn new(width: usize, height: usize) -> Self {
+    pub fn new(width: usize, height: usize) -> Self {
         SnakeGame {
             width,
             height,
@@ -47,7 +46,7 @@ impl SnakeGame {
         }
     }
 
-    fn change_direction(&mut self, direction: Direction) {
+    pub fn change_direction(&mut self, direction: Direction) {
         match (&self.direction, direction) {
             (Direction::Up, Direction::Up)
             | (Direction::Up, Direction::Down)
@@ -65,7 +64,7 @@ impl SnakeGame {
         pos.x < self.width && pos.y < self.height
     }
 
-    fn game_loop(&mut self) {
+    pub fn game_loop(&mut self) {
         if self.finished {
             return;
         }
@@ -75,10 +74,22 @@ impl SnakeGame {
         let head = &self.snake[0];
 
         let new_head = match &self.direction {
-            Direction::Up => Position{ x: head.x, y: head.y - 1 },
-            Direction::Right => Position { x: head.x + 1, y: head.y },
-            Direction::Down => Position { x: head.x, y: head.y + 1 },
-            Direction::Left => Position { x: head.x - 1, y: head.y },
+            Direction::Up => Position {
+                x: head.x,
+                y: head.y - 1,
+            },
+            Direction::Right => Position {
+                x: head.x + 1,
+                y: head.y,
+            },
+            Direction::Down => Position {
+                x: head.x,
+                y: head.y + 1,
+            },
+            Direction::Left => Position {
+                x: head.x - 1,
+                y: head.y,
+            },
         };
 
         if !self.is_valid(&new_head) || self.snake.contains(&new_head) {
@@ -100,7 +111,6 @@ impl SnakeGame {
                 self.food = free_positions[get_random_number(0, free_positions.len())];
             }
             self.snake.push_front(new_head);
-
         }
     }
 }
@@ -148,7 +158,10 @@ mod tests {
         assert!(game.snake.len() == 1);
 
         let head = game.snake[0];
-        game.food = Position{x: head.x + 2, y: head.y}; // the food is 2 cells in front
+        game.food = Position {
+            x: head.x + 2,
+            y: head.y,
+        }; // the food is 2 cells in front
 
         game.game_loop();
         assert!(game.snake.len() == 1);
