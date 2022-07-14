@@ -11,8 +11,10 @@ thread_local! {
     static GAME: RefCell<SnakeGame> = RefCell::new(SnakeGame::new(20, 20));
 
     static HANDLE_GAME_LOOP: Closure<dyn FnMut()> = Closure::wrap(Box::new(|| {
-        GAME.with(|game| game.borrow_mut().game_loop());
-        render();
+        if GAME.with(|game| !game.borrow().finished) {
+            GAME.with(|game| game.borrow_mut().game_loop());
+            render();
+        }
       }) as Box<dyn FnMut()>);
 
     static HANDLE_KEYDOWN: Closure<dyn FnMut(KeyboardEvent)> =
@@ -33,11 +35,11 @@ thread_local! {
 
 #[wasm_bindgen(start)]
 pub fn main() {
-    HANDLE_GAME_LOOP.with(|tick_closure| {
+    HANDLE_GAME_LOOP.with(|loop_closure| {
         window()
             .unwrap_throw()
             .set_interval_with_callback_and_timeout_and_arguments_0(
-                tick_closure.as_ref().dyn_ref::<Function>().unwrap_throw(),
+                loop_closure.as_ref().dyn_ref::<Function>().unwrap_throw(),
                 200,
             )
             .unwrap_throw()
@@ -62,6 +64,21 @@ pub fn render() {
 
         let window = web_sys::window().expect("no global `window` exists");
         let document = window.document().expect("should have a document on window");
+
+        let point_container = document
+            .get_element_by_id("points")
+            .unwrap_throw()
+            .dyn_into::<HtmlElement>()
+            .unwrap_throw();
+
+        let snake_len = game.snake.len() - 1;
+        let point_str = match snake_len {
+            1 => "point",
+            _ => "points",
+        };
+        let point_text = format!("{} {}", snake_len, &point_str);
+
+        point_container.set_inner_text(&point_text);
 
         let root_container = document
             .get_element_by_id("root")
